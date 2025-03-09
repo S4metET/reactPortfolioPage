@@ -1,17 +1,6 @@
-/**
- * @copyright 2025 s4metet
- * @license Apache-2.0
- */
-
-import { ButtonPrimary, ButtonOutline } from "./Button";
-
-
 const Hero = () => {
   return (
-    <section
-      id="home"
-      className="pt-28 lg:pt-36"
-    >
+    <section id="home" className="pt-28 lg:pt-36">
       <div className="container items-center lg:grid lg:grid-cols-2 lg:gap-10">
 
         <div>
@@ -29,22 +18,21 @@ const Hero = () => {
           </h2>
         </div>
 
-        <div className="hidden lg:block">
-          <figure className="w-full max-w-[480px] ml-auto bg-gradient-to-t from-sky-400 via-25% via-sky-400/40 to-65% rounded-[60px] overflow-hidden">
+        <div className="block">
+          <figure className="w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[480px] mx-auto bg-gradient-to-t from-sky-400 via-25% via-sky-400/40 to-65% rounded-[30px] lg:rounded-[60px] overflow-hidden">
             <img
               src="/images/hero-banner.png"
               width={656}
               height={800}
-              alt="Henry Clark"
-              className="w-full"
+              alt=""
+              className="w-full h-auto"
             />
           </figure>
         </div>
 
       </div>
-
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;
