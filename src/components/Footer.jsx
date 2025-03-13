@@ -40,10 +40,6 @@ const socials = [
   {
     label: 'Instagram',
     href: 'https://www.instagram.com/codewithsadee'
-  },
-  {
-    label: 'CodePen',
-    href: 'https://codepen.io/codewithsadee'
   }
 ];
 
