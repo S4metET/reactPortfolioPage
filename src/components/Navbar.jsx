@@ -13,10 +13,12 @@ const Navbar = ({ navOpen }) => {
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      activeBox.current.style.top = `${lastActiveLink.current.offsetTop}px`;
-      activeBox.current.style.left = `${lastActiveLink.current.offsetLeft}px`;
-      activeBox.current.style.width = `${lastActiveLink.current.offsetWidth}px`;
-      activeBox.current.style.height = `${lastActiveLink.current.offsetHeight}px`;
+      requestAnimationFrame(() => {
+        activeBox.current.style.top = `${lastActiveLink.current.offsetTop}px`;
+        activeBox.current.style.left = `${lastActiveLink.current.offsetLeft}px`;
+        activeBox.current.style.width = `${lastActiveLink.current.offsetWidth}px`;
+        activeBox.current.style.height = `${lastActiveLink.current.offsetHeight}px`;
+      });
     }
   };
 
@@ -46,7 +48,7 @@ const Navbar = ({ navOpen }) => {
           lastActiveLink.current?.classList.remove("active");
           activeLink.classList.add("active");
           lastActiveLink.current = activeLink;
-          initActiveBox();
+          setTimeout(initActiveBox, 50); // Mobilde gecikmeyi önlemek için
         }
       }
     };
@@ -54,7 +56,7 @@ const Navbar = ({ navOpen }) => {
     updateSections();
 
     const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.3, // Daha hassas algılama
+      threshold: [0.5, 0.7, 0.9], // Daha hassas algılama (özellikle mobil için)
     });
 
     Object.values(sectionRefs.current).forEach((section) => {
@@ -80,11 +82,10 @@ const Navbar = ({ navOpen }) => {
         behavior: "smooth",
       });
 
-      // Mobilde bazen geç algılandığı için sınıfı hemen ekleyelim
       document.querySelectorAll(".nav-link").forEach((link) => link.classList.remove("active"));
       event.target.classList.add("active");
       lastActiveLink.current = event.target;
-      initActiveBox();
+      setTimeout(initActiveBox, 50); // Smooth efekt için ufak bir gecikme
     }
   };
 
