@@ -59,7 +59,7 @@ const Navbar = ({ navOpen }) => {
           }
         }
       },
-      { threshold: [0.3, 0.6, 0.9] }
+      { threshold: [0.3] }
     );
 
     Object.values(sectionRefs.current).forEach((section) => {
