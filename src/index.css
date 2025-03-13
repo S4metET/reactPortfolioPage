@@ -20,7 +20,7 @@ body {
 .headline-1 span {
   background: none !important;
   -webkit-text-fill-color: initial !important;
-  color: #38bdf8 !important; /* Tailwind'in sky-400 rengi */
+  color: #38bdf8 !important;
 }
 
 .headline-1 {

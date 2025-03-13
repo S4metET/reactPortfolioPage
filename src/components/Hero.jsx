@@ -12,7 +12,7 @@ const Hero = () => {
     });
 
     ScrollReveal().reveal(".hero-text", { origin: "top" });
-    ScrollReveal().reveal(".hero-image", { origin: "right" });
+    ScrollReveal().reveal(".hero-image", { origin: "left" });
 
     const typed = new Typed(".typed-text", {
       strings: ["Front-End Developer", "React Developer"],
@@ -43,7 +43,7 @@ const Hero = () => {
           <h2 className="headline-1 max-w-[15ch] sm:max-w-[20ch] lg:max-w-[15ch] mt-5 mb-8 lg:mb-10">
               <span>Merhaba!</span> Ben Samet Eren Terzi
           </h2>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-sky-400 pb-2">
+          <h2 className="text-2xl mb-5 sm:text-3xl md:text-4xl font-bold text-sky-400">
             <span className="typed-text"></span>
           </h2>
         </div>

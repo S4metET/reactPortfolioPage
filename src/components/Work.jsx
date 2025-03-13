@@ -51,7 +51,7 @@ const Work = () => {
     });
 
     ScrollReveal().reveal(".project-item", {
-      origin: "right",
+      origin: "left",
       distance: "50px",
       duration: 1500,
       delay: 200,
