@@ -7,16 +7,17 @@ import { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const Navbar = ({ navOpen }) => {
-  const lastActiveLink = useRef();
-  const activeBox = useRef();
+  const lastActiveLink = useRef(null);
+  const activeBox = useRef(null);
   const sectionRefs = useRef({});
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      activeBox.current.style.top = `${lastActiveLink.current.offsetTop}px`;
-      activeBox.current.style.left = `${lastActiveLink.current.offsetLeft}px`;
-      activeBox.current.style.width = `${lastActiveLink.current.offsetWidth}px`;
-      activeBox.current.style.height = `${lastActiveLink.current.offsetHeight}px`;
+      const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = lastActiveLink.current;
+      activeBox.current.style.top = `${offsetTop}px`;
+      activeBox.current.style.left = `${offsetLeft}px`;
+      activeBox.current.style.width = `${offsetWidth}px`;
+      activeBox.current.style.height = `${offsetHeight}px`;
     }
   };
 
@@ -29,48 +30,41 @@ const Navbar = ({ navOpen }) => {
       });
     };
 
+    const handleIntersection = (entries) => {
+      let mostVisibleSection = null;
+      let maxIntersectionRatio = 0;
+
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+          mostVisibleSection = entry.target;
+          maxIntersectionRatio = entry.intersectionRatio;
+        }
+      });
+
+      if (mostVisibleSection) {
+        const activeLink = document.querySelector(`a[href="#${mostVisibleSection.id}"]`);
+        if (activeLink && lastActiveLink.current !== activeLink) {
+          lastActiveLink.current?.classList.remove("active");
+          activeLink.classList.add("active");
+          lastActiveLink.current = activeLink;
+          initActiveBox();
+        }
+      }
+    };
+
     updateSections();
 
-    if (Object.keys(sectionRefs.current).length === 0) {
-      console.warn("Bölümler bulunamadı. ID'leri kontrol edin.");
-      return;
-    }
-
-    initActiveBox();
-    window.addEventListener("resize", initActiveBox);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let mostVisibleSection = null;
-        let maxIntersectionRatio = 0;
-
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
-            mostVisibleSection = entry.target;
-            maxIntersectionRatio = entry.intersectionRatio;
-          }
-        });
-
-        if (mostVisibleSection) {
-          const activeLink = document.querySelector(`a[href="#${mostVisibleSection.id}"]`);
-          if (activeLink && lastActiveLink.current !== activeLink) {
-            lastActiveLink.current?.classList.remove("active");
-            activeLink.classList.add("active");
-            lastActiveLink.current = activeLink;
-            initActiveBox();
-          }
-        }
-      },
-      { threshold: [0.3, 0.6, 0.9] }
-    );
+    const observer = new IntersectionObserver(handleIntersection, { threshold: [0.5] });
 
     Object.values(sectionRefs.current).forEach((section) => {
       if (section) observer.observe(section);
     });
 
+    window.addEventListener("resize", initActiveBox);
+
     return () => {
-      window.removeEventListener("resize", initActiveBox);
       observer.disconnect();
+      window.removeEventListener("resize", initActiveBox);
     };
   }, []);
 
@@ -79,15 +73,12 @@ const Navbar = ({ navOpen }) => {
     const targetId = event.target.getAttribute("href").substring(1);
     const targetSection = document.getElementById(targetId);
 
-    if (!targetSection) {
-      console.warn(`Bölüm bulunamadı: ${targetId}`);
-      return;
+    if (targetSection) {
+      window.scrollTo({
+        top: targetSection.offsetTop - 50,
+        behavior: "smooth",
+      });
     }
-
-    window.scrollTo({
-      top: targetSection.offsetTop - 50,
-      behavior: "smooth",
-    });
   };
 
   const navItems = [
