@@ -48,7 +48,7 @@ const Navbar = ({ navOpen }) => {
           lastActiveLink.current?.classList.remove("active");
           activeLink.classList.add("active");
           lastActiveLink.current = activeLink;
-          setTimeout(initActiveBox, 50); // Mobilde gecikmeyi önlemek için
+          setTimeout(initActiveBox, 50);
         }
       }
     };
@@ -78,14 +78,14 @@ const Navbar = ({ navOpen }) => {
 
     if (targetSection) {
       window.scrollTo({
-        top: targetSection.offsetTop - 60, // Navbar yüksekliği kadar boşluk bırak
+        top: targetSection.offsetTop - 60,
         behavior: "smooth",
       });
 
       document.querySelectorAll(".nav-link").forEach((link) => link.classList.remove("active"));
       event.target.classList.add("active");
       lastActiveLink.current = event.target;
-      setTimeout(initActiveBox, 50); // Smooth efekt için ufak bir gecikme
+      setTimeout(initActiveBox, 50);
     }
   };
 

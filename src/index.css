@@ -17,6 +17,11 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.headline-1 span {
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  color: #38bdf8 !important; /* Tailwind'in sky-400 rengi */
+}
 
 .headline-1 {
   @apply text-5xl leading-tight font-semibold lg:text-[55px] lg:leading-[1.15]
@@ -113,4 +118,26 @@ body {
 
 .text-field::placeholder {
   @apply text-zinc-400
+}
+
+@keyframes typing {
+  from {
+      width: 0;
+  }
+  to {
+      width: 100%;
+  }
+}
+
+@keyframes blink {
+  50% {
+      border-color: transparent;
+  }
+}
+
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid gray;
+  animation: typing 3s steps(10, end) forwards, blink 0.3s infinite;
 }
