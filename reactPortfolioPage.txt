@@ -1,0 +1,2 @@
+Vercel: https://react-portfolio-page-qgxe.vercel.app/
+Github: https://github.com/S4metET/reactPortfolioPage

@@ -9,77 +9,93 @@ import PropTypes from "prop-types";
 const Navbar = ({ navOpen }) => {
   const lastActiveLink = useRef();
   const activeBox = useRef();
+  const sectionRefs = useRef({});
 
   const initActiveBox = () => {
-    activeBox.current.style.top = lastActiveLink.current.offsetTop + 'px';
-    activeBox.current.style.left = lastActiveLink.current.offsetLeft + 'px';
-    activeBox.current.style.width = lastActiveLink.current.offsetWidth + 'px';
-    activeBox.current.style.height = lastActiveLink.current.offsetHeight + 'px';
-  }
+    if (lastActiveLink.current) {
+      activeBox.current.style.top = lastActiveLink.current.offsetTop + 'px';
+      activeBox.current.style.left = lastActiveLink.current.offsetLeft + 'px';
+      activeBox.current.style.width = lastActiveLink.current.offsetWidth + 'px';
+      activeBox.current.style.height = lastActiveLink.current.offsetHeight + 'px';
+    }
+  };
 
-  useEffect(initActiveBox, []);
-  window.addEventListener('resize', initActiveBox);
+  useEffect(() => {
+    initActiveBox();
+    window.addEventListener('resize', initActiveBox);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const activeLink = document.querySelector(`a[href="#${entry.target.id}"]`);
+            if (activeLink) {
+              lastActiveLink.current?.classList.remove('active');
+              activeLink.classList.add('active');
+              lastActiveLink.current = activeLink;
+              initActiveBox();
+            }
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    Object.values(sectionRefs.current).forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => {
+      window.removeEventListener('resize', initActiveBox);
+      observer.disconnect();
+    };
+  }, []);
 
   const activeCurrentLink = (event) => {
-    lastActiveLink.current?.classList.remove('active');
-    event.target.classList.add('active');
-    lastActiveLink.current = event.target;
-
-    activeBox.current.style.top = event.target.offsetTop + 'px';
-    activeBox.current.style.left = event.target.offsetLeft + 'px';
-    activeBox.current.style.width = event.target.offsetWidth + 'px';
-    activeBox.current.style.height = event.target.offsetHeight + 'px';
-  }
+    event.preventDefault();
+    const targetId = event.target.getAttribute('href').substring(1);
+    const targetSection = document.getElementById(targetId);
+    if (targetSection) {
+      window.scrollTo({
+        top: targetSection.offsetTop - 50,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const navItems = [
-    {
-      label: 'Ana Sayfa',
-      link: '#home',
-      className: 'nav-link active',
-      ref: lastActiveLink
-    },
-    {
-      label: 'Ben Kimim',
-      link: '#about',
-      className: 'nav-link'
-    },
-    {
-      label: 'Projelerim',
-      link: '#work',
-      className: 'nav-link'
-    },
-    {
-      label: 'Bana Ulaşın',
-      link: '#contact',
-      className: 'nav-link'
-    }
+    { label: 'Ana Sayfa', link: '#home', className: 'nav-link active' },
+    { label: 'Ben Kimim', link: '#about', className: 'nav-link' },
+    { label: 'Projelerim', link: '#work', className: 'nav-link' },
+    { label: 'Bana Ulaşın', link: '#contact', className: 'nav-link' }
   ];
+
+  useEffect(() => {
+    navItems.forEach(({ link }) => {
+      const sectionId = link.replace('#', '');
+      sectionRefs.current[sectionId] = document.getElementById(sectionId);
+    });
+  }, []);
 
   return (
     <nav className={'navbar ' + (navOpen ? 'active' : '')}>
-      {
-        navItems.map(({ label, link, className, ref }, key) => (
-          <a
-            href={link}
-            key={key}
-            ref={ref}
-            className={className}
-            onClick={activeCurrentLink}
-          >
-            {label}
-          </a>
-        ))
-      }
-      <div
-        className="active-box"
-        ref={activeBox}
-      ></div>
+      {navItems.map(({ label, link, className }, key) => (
+        <a
+          href={link}
+          key={key}
+          className={className}
+          onClick={activeCurrentLink}
+        >
+          {label}
+        </a>
+      ))}
+      <div className="active-box" ref={activeBox}></div>
     </nav>
-  )
-}
+  );
+};
 
 Navbar.propTypes = {
   navOpen: PropTypes.bool.isRequired
-}
+};
 
-export default Navbar
+export default Navbar;
