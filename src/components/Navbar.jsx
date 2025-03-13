@@ -74,10 +74,7 @@ const Navbar = ({ navOpen }) => {
     const targetSection = document.getElementById(targetId);
 
     if (targetSection) {
-      window.scrollTo({
-        top: targetSection.offsetTop - 50,
-        behavior: "smooth",
-      });
+      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
