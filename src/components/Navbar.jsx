@@ -26,19 +26,27 @@ const Navbar = ({ navOpen }) => {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        let mostVisibleSection = null;
+        let maxIntersectionRatio = 0;
+
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const activeLink = document.querySelector(`a[href="#${entry.target.id}"]`);
-            if (activeLink) {
-              lastActiveLink.current?.classList.remove('active');
-              activeLink.classList.add('active');
-              lastActiveLink.current = activeLink;
-              initActiveBox();
-            }
+          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+            mostVisibleSection = entry.target;
+            maxIntersectionRatio = entry.intersectionRatio;
           }
         });
+
+        if (mostVisibleSection) {
+          const activeLink = document.querySelector(`a[href="#${mostVisibleSection.id}"]`);
+          if (activeLink && lastActiveLink.current !== activeLink) {
+            lastActiveLink.current?.classList.remove('active');
+            activeLink.classList.add('active');
+            lastActiveLink.current = activeLink;
+            initActiveBox();
+          }
+        }
       },
-      { threshold: 0.3 }
+      { threshold: [0.3, 0.6, 0.9] }
     );
 
     Object.values(sectionRefs.current).forEach((section) => {
@@ -64,7 +72,7 @@ const Navbar = ({ navOpen }) => {
   };
 
   const navItems = [
-    { label: 'Ana Sayfa', link: '#home', className: 'nav-link active' },
+    { label: 'Ana Sayfa', link: '#home', className: 'nav-link' },
     { label: 'Ben Kimim', link: '#about', className: 'nav-link' },
     { label: 'Projelerim', link: '#work', className: 'nav-link' },
     { label: 'Bana Ulaşın', link: '#contact', className: 'nav-link' }
