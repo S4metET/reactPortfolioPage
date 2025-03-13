@@ -7,16 +7,18 @@ import { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const Navbar = ({ navOpen }) => {
-  const lastActiveLink = useRef();
-  const activeBox = useRef();
+  const lastActiveLink = useRef(null);
+  const activeBox = useRef(null);
   const sectionRefs = useRef({});
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      activeBox.current.style.top = lastActiveLink.current.offsetTop + "px";
-      activeBox.current.style.left = lastActiveLink.current.offsetLeft + "px";
-      activeBox.current.style.width = lastActiveLink.current.offsetWidth + "px";
-      activeBox.current.style.height = lastActiveLink.current.offsetHeight + "px";
+      requestAnimationFrame(() => {
+        activeBox.current.style.top = lastActiveLink.current.offsetTop + "px";
+        activeBox.current.style.left = lastActiveLink.current.offsetLeft + "px";
+        activeBox.current.style.width = lastActiveLink.current.offsetWidth + "px";
+        activeBox.current.style.height = lastActiveLink.current.offsetHeight + "px";
+      });
     }
   };
 
@@ -27,12 +29,12 @@ const Navbar = ({ navOpen }) => {
     const observer = new IntersectionObserver(
       (entries) => {
         let mostVisibleSection = null;
-        let maxIntersectionRatio = 0;
+        let maxRatio = 0;
 
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
             mostVisibleSection = entry.target;
-            maxIntersectionRatio = entry.intersectionRatio;
+            maxRatio = entry.intersectionRatio;
           }
         });
 
@@ -63,12 +65,15 @@ const Navbar = ({ navOpen }) => {
     event.preventDefault();
     const targetId = event.target.getAttribute("href").substring(1);
     const targetSection = document.getElementById(targetId);
+    
     if (targetSection) {
-      const offsetTop = targetSection.getBoundingClientRect().top + window.scrollY - 60; // Daha doğru konumlandırma
-      window.scrollTo({
-        top: offsetTop,
-        behavior: "smooth",
-      });
+      const offsetTop = targetSection.getBoundingClientRect().top + window.scrollY - 60;
+
+      if ("scrollBehavior" in document.documentElement.style) {
+        window.scrollTo({ top: offsetTop, behavior: "smooth" });
+      } else {
+        targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
