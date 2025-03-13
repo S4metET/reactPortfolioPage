@@ -7,65 +7,55 @@ import { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const Navbar = ({ navOpen }) => {
-  const lastActiveLink = useRef(null);
-  const activeBox = useRef(null);
+  const lastActiveLink = useRef();
+  const activeBox = useRef();
   const sectionRefs = useRef({});
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      activeBox.current.style.top = `${lastActiveLink.current.offsetTop}px`;
-      activeBox.current.style.left = `${lastActiveLink.current.offsetLeft}px`;
-      activeBox.current.style.width = `${lastActiveLink.current.offsetWidth}px`;
-      activeBox.current.style.height = `${lastActiveLink.current.offsetHeight}px`;
+      activeBox.current.style.top = lastActiveLink.current.offsetTop + "px";
+      activeBox.current.style.left = lastActiveLink.current.offsetLeft + "px";
+      activeBox.current.style.width = lastActiveLink.current.offsetWidth + "px";
+      activeBox.current.style.height = lastActiveLink.current.offsetHeight + "px";
     }
   };
 
   useEffect(() => {
-    const updateSections = () => {
-      navItems.forEach(({ link }) => {
-        const sectionId = link.substring(1);
-        const section = document.getElementById(sectionId);
-        if (section) sectionRefs.current[sectionId] = section;
-      });
-    };
+    initActiveBox();
+    window.addEventListener("resize", initActiveBox);
 
-    const handleIntersection = (entries) => {
-      let mostVisibleSection = null;
-      let maxIntersectionRatio = 0;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let mostVisibleSection = null;
+        let maxIntersectionRatio = 0;
 
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
-          mostVisibleSection = entry.target;
-          maxIntersectionRatio = entry.intersectionRatio;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+            mostVisibleSection = entry.target;
+            maxIntersectionRatio = entry.intersectionRatio;
+          }
+        });
+
+        if (mostVisibleSection) {
+          const activeLink = document.querySelector(`a[href="#${mostVisibleSection.id}"]`);
+          if (activeLink && lastActiveLink.current !== activeLink) {
+            lastActiveLink.current?.classList.remove("active");
+            activeLink.classList.add("active");
+            lastActiveLink.current = activeLink;
+            initActiveBox();
+          }
         }
-      });
-
-      if (mostVisibleSection) {
-        const activeLink = document.querySelector(`a[href="#${mostVisibleSection.id}"]`);
-        if (activeLink && lastActiveLink.current !== activeLink) {
-          lastActiveLink.current?.classList.remove("active");
-          activeLink.classList.add("active");
-          lastActiveLink.current = activeLink;
-          initActiveBox();
-        }
-      }
-    };
-
-    updateSections();
-
-    const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.3, // Daha hassas algılama
-    });
+      },
+      { threshold: [0.3, 0.6, 0.9] }
+    );
 
     Object.values(sectionRefs.current).forEach((section) => {
       if (section) observer.observe(section);
     });
 
-    window.addEventListener("resize", initActiveBox);
-
     return () => {
-      observer.disconnect();
       window.removeEventListener("resize", initActiveBox);
+      observer.disconnect();
     };
   }, []);
 
@@ -73,18 +63,12 @@ const Navbar = ({ navOpen }) => {
     event.preventDefault();
     const targetId = event.target.getAttribute("href").substring(1);
     const targetSection = document.getElementById(targetId);
-
     if (targetSection) {
+      const offsetTop = targetSection.getBoundingClientRect().top + window.scrollY - 60; // Daha doğru konumlandırma
       window.scrollTo({
-        top: targetSection.offsetTop - 60, // Navbar yüksekliği kadar boşluk bırak
+        top: offsetTop,
         behavior: "smooth",
       });
-
-      // Mobilde bazen geç algılandığı için sınıfı hemen ekleyelim
-      document.querySelectorAll(".nav-link").forEach((link) => link.classList.remove("active"));
-      event.target.classList.add("active");
-      lastActiveLink.current = event.target;
-      initActiveBox();
     }
   };
 
@@ -97,7 +81,7 @@ const Navbar = ({ navOpen }) => {
 
   useEffect(() => {
     navItems.forEach(({ link }) => {
-      const sectionId = link.substring(1);
+      const sectionId = link.replace("#", "");
       sectionRefs.current[sectionId] = document.getElementById(sectionId);
     });
   }, []);
