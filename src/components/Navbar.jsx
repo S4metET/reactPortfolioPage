@@ -7,24 +7,35 @@ import { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const Navbar = ({ navOpen }) => {
-  const lastActiveLink = useRef();
-  const activeBox = useRef();
+  const lastActiveLink = useRef(null);
+  const activeBox = useRef(null);
   const sectionRefs = useRef({});
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      activeBox.current.style.top = lastActiveLink.current.offsetTop + 'px';
-      activeBox.current.style.left = lastActiveLink.current.offsetLeft + 'px';
-      activeBox.current.style.width = lastActiveLink.current.offsetWidth + 'px';
-      activeBox.current.style.height = lastActiveLink.current.offsetHeight + 'px';
-      activeBox.current.style.opacity = '1';
-      activeBox.current.style.transition = 'all 0.3s ease-in-out';
+      const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = lastActiveLink.current;
+      activeBox.current.style.top = `${offsetTop}px`;
+      activeBox.current.style.left = `${offsetLeft}px`;
+      activeBox.current.style.width = `${offsetWidth}px`;
+      activeBox.current.style.height = `${offsetHeight}px`;
     }
   };
 
   useEffect(() => {
-    initActiveBox();
-    window.addEventListener('resize', initActiveBox);
+    const updateSections = () => {
+      navItems.forEach(({ link }) => {
+        const sectionId = link.substring(1);
+        const section = document.getElementById(sectionId);
+        if (section) sectionRefs.current[sectionId] = section;
+      });
+    };
+
+    // Sayfa yüklendiğinde section'ları al
+    updateSections();
+
+    // Sayfa yüklendiğinde veya yeniden boyutlandığında aktif kutuyu ayarla
+    window.addEventListener("resize", initActiveBox);
+    window.addEventListener("load", updateSections);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -41,8 +52,8 @@ const Navbar = ({ navOpen }) => {
         if (mostVisibleSection) {
           const activeLink = document.querySelector(`a[href="#${mostVisibleSection.id}"]`);
           if (activeLink && lastActiveLink.current !== activeLink) {
-            lastActiveLink.current?.classList.remove('active');
-            activeLink.classList.add('active');
+            lastActiveLink.current?.classList.remove("active");
+            activeLink.classList.add("active");
             lastActiveLink.current = activeLink;
             initActiveBox();
           }
@@ -56,15 +67,17 @@ const Navbar = ({ navOpen }) => {
     });
 
     return () => {
-      window.removeEventListener('resize', initActiveBox);
+      window.removeEventListener("resize", initActiveBox);
+      window.removeEventListener("load", updateSections);
       observer.disconnect();
     };
   }, []);
 
   const activeCurrentLink = (event) => {
     event.preventDefault();
-    const targetId = event.target.getAttribute('href').substring(1);
+    const targetId = event.target.getAttribute("href").substring(1);
     const targetSection = document.getElementById(targetId);
+
     if (targetSection) {
       window.scrollTo({
         top: targetSection.offsetTop - 50,
@@ -74,38 +87,26 @@ const Navbar = ({ navOpen }) => {
   };
 
   const navItems = [
-    { label: 'Ana Sayfa', link: '#home', className: 'nav-link' },
-    { label: 'Ben Kimim', link: '#about', className: 'nav-link' },
-    { label: 'Projelerim', link: '#work', className: 'nav-link' },
-    { label: 'Bana Ulaşın', link: '#contact', className: 'nav-link' }
+    { label: "Ana Sayfa", link: "#home", className: "nav-link" },
+    { label: "Ben Kimim", link: "#about", className: "nav-link" },
+    { label: "Projelerim", link: "#work", className: "nav-link" },
+    { label: "Bana Ulaşın", link: "#contact", className: "nav-link" },
   ];
 
-  useEffect(() => {
-    navItems.forEach(({ link }) => {
-      const sectionId = link.replace('#', '');
-      sectionRefs.current[sectionId] = document.getElementById(sectionId);
-    });
-  }, []);
-
   return (
-    <nav className={'navbar ' + (navOpen ? 'active' : '')}>
+    <nav className={`navbar ${navOpen ? "active" : ""}`}>
       {navItems.map(({ label, link, className }, key) => (
-        <a
-          href={link}
-          key={key}
-          className={className}
-          onClick={activeCurrentLink}
-        >
+        <a href={link} key={key} className={className} onClick={activeCurrentLink}>
           {label}
         </a>
       ))}
-      <div className="active-box" ref={activeBox} style={{ opacity: 0 }}></div>
+      <div className="active-box" ref={activeBox}></div>
     </nav>
   );
 };
 
 Navbar.propTypes = {
-  navOpen: PropTypes.bool.isRequired
+  navOpen: PropTypes.bool.isRequired,
 };
 
 export default Navbar;
