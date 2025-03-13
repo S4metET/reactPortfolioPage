@@ -22,12 +22,20 @@ const Navbar = ({ navOpen }) => {
 
   useEffect(() => {
     const updateSections = () => {
-      Object.keys(sectionRefs.current).forEach((id) => {
-        sectionRefs.current[id] = document.getElementById(id);
+      navItems.forEach(({ link }) => {
+        const sectionId = link.substring(1);
+        const section = document.getElementById(sectionId);
+        if (section) sectionRefs.current[sectionId] = section;
       });
     };
 
     updateSections();
+
+    if (Object.keys(sectionRefs.current).length === 0) {
+      console.warn("Bölümler bulunamadı. ID'leri kontrol edin.");
+      return;
+    }
+
     initActiveBox();
     window.addEventListener("resize", initActiveBox);
 
@@ -71,12 +79,15 @@ const Navbar = ({ navOpen }) => {
     const targetId = event.target.getAttribute("href").substring(1);
     const targetSection = document.getElementById(targetId);
 
-    if (targetSection) {
-      window.scrollTo({
-        top: targetSection.offsetTop - 50,
-        behavior: "smooth",
-      });
+    if (!targetSection) {
+      console.warn(`Bölüm bulunamadı: ${targetId}`);
+      return;
     }
+
+    window.scrollTo({
+      top: targetSection.offsetTop - 50,
+      behavior: "smooth",
+    });
   };
 
   const navItems = [
