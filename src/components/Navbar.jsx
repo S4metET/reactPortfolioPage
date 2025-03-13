@@ -7,35 +7,29 @@ import { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const Navbar = ({ navOpen }) => {
-  const lastActiveLink = useRef(null);
-  const activeBox = useRef(null);
+  const lastActiveLink = useRef();
+  const activeBox = useRef();
   const sectionRefs = useRef({});
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = lastActiveLink.current;
-      activeBox.current.style.top = `${offsetTop}px`;
-      activeBox.current.style.left = `${offsetLeft}px`;
-      activeBox.current.style.width = `${offsetWidth}px`;
-      activeBox.current.style.height = `${offsetHeight}px`;
+      activeBox.current.style.top = `${lastActiveLink.current.offsetTop}px`;
+      activeBox.current.style.left = `${lastActiveLink.current.offsetLeft}px`;
+      activeBox.current.style.width = `${lastActiveLink.current.offsetWidth}px`;
+      activeBox.current.style.height = `${lastActiveLink.current.offsetHeight}px`;
     }
   };
 
   useEffect(() => {
     const updateSections = () => {
-      navItems.forEach(({ link }) => {
-        const sectionId = link.substring(1);
-        const section = document.getElementById(sectionId);
-        if (section) sectionRefs.current[sectionId] = section;
+      Object.keys(sectionRefs.current).forEach((id) => {
+        sectionRefs.current[id] = document.getElementById(id);
       });
     };
 
-    // Sayfa yüklendiğinde section'ları al
     updateSections();
-
-    // Sayfa yüklendiğinde veya yeniden boyutlandığında aktif kutuyu ayarla
+    initActiveBox();
     window.addEventListener("resize", initActiveBox);
-    window.addEventListener("load", updateSections);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -59,7 +53,7 @@ const Navbar = ({ navOpen }) => {
           }
         }
       },
-      { threshold: [0.3] }
+      { threshold: [0.3, 0.6, 0.9] }
     );
 
     Object.values(sectionRefs.current).forEach((section) => {
@@ -68,7 +62,6 @@ const Navbar = ({ navOpen }) => {
 
     return () => {
       window.removeEventListener("resize", initActiveBox);
-      window.removeEventListener("load", updateSections);
       observer.disconnect();
     };
   }, []);
@@ -93,8 +86,15 @@ const Navbar = ({ navOpen }) => {
     { label: "Bana Ulaşın", link: "#contact", className: "nav-link" },
   ];
 
+  useEffect(() => {
+    navItems.forEach(({ link }) => {
+      const sectionId = link.substring(1);
+      sectionRefs.current[sectionId] = document.getElementById(sectionId);
+    });
+  }, []);
+
   return (
-    <nav className={`navbar ${navOpen ? "active" : ""}`}>
+    <nav className={"navbar " + (navOpen ? "active" : "")}>
       {navItems.map(({ label, link, className }, key) => (
         <a href={link} key={key} className={className} onClick={activeCurrentLink}>
           {label}
