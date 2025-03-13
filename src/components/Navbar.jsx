@@ -13,11 +13,10 @@ const Navbar = ({ navOpen }) => {
 
   const initActiveBox = () => {
     if (lastActiveLink.current && activeBox.current) {
-      const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = lastActiveLink.current;
-      activeBox.current.style.top = `${offsetTop}px`;
-      activeBox.current.style.left = `${offsetLeft}px`;
-      activeBox.current.style.width = `${offsetWidth}px`;
-      activeBox.current.style.height = `${offsetHeight}px`;
+      activeBox.current.style.top = `${lastActiveLink.current.offsetTop}px`;
+      activeBox.current.style.left = `${lastActiveLink.current.offsetLeft}px`;
+      activeBox.current.style.width = `${lastActiveLink.current.offsetWidth}px`;
+      activeBox.current.style.height = `${lastActiveLink.current.offsetHeight}px`;
     }
   };
 
@@ -54,7 +53,9 @@ const Navbar = ({ navOpen }) => {
 
     updateSections();
 
-    const observer = new IntersectionObserver(handleIntersection, { threshold: [0.5] });
+    const observer = new IntersectionObserver(handleIntersection, {
+      threshold: 0.3, // Daha hassas algılama
+    });
 
     Object.values(sectionRefs.current).forEach((section) => {
       if (section) observer.observe(section);
@@ -74,7 +75,16 @@ const Navbar = ({ navOpen }) => {
     const targetSection = document.getElementById(targetId);
 
     if (targetSection) {
-      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollTo({
+        top: targetSection.offsetTop - 60, // Navbar yüksekliği kadar boşluk bırak
+        behavior: "smooth",
+      });
+
+      // Mobilde bazen geç algılandığı için sınıfı hemen ekleyelim
+      document.querySelectorAll(".nav-link").forEach((link) => link.classList.remove("active"));
+      event.target.classList.add("active");
+      lastActiveLink.current = event.target;
+      initActiveBox();
     }
   };
 
