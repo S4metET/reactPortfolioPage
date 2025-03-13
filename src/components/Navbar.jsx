@@ -56,7 +56,7 @@ const Navbar = ({ navOpen }) => {
     updateSections();
 
     const observer = new IntersectionObserver(handleIntersection, {
-      threshold: [0.5, 0.7, 0.9], // Daha hassas algılama (özellikle mobil için)
+      threshold: [0.3],
     });
 
     Object.values(sectionRefs.current).forEach((section) => {
