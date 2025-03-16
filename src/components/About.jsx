@@ -28,7 +28,7 @@ const About = () => {
       duration: 1500,
       delay: 300,
       reset: true,
-      interval: 200, // Öğeler arasında gecikme
+      interval: 200,
     });
   }, []);
 
@@ -36,7 +36,7 @@ const About = () => {
     <section id="about" className="section">
       <div className="container">
         <div className="bg-zinc-800/50 p-7 rounded-2xl md:p-12 reveal-up">
-          <p className="text-zinc-300 mb-4 md:mb-8 md:text-xl md:max-w-[60ch]">
+          <p className="text-zinc-300 mb-4 md:mb-8 md:text-xl md:w-full">
             Junior Front-End Developer olarak, HTML, CSS ve JavaScript ile
             kullanıcı dostu ve etkileşimli arayüzler geliştiriyorum. Yeni
             başlayan biri olarak, kullanıcı deneyimini iyileştiren çözümler

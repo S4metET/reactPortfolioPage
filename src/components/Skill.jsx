@@ -4,11 +4,6 @@ import SkillCard from "./SkillCard";
 
 const skillItem = [
   {
-    imgSrc: "/images/react.svg",
-    label: "React",
-    desc: "Framework",
-  },
-  {
     imgSrc: "/images/figma.svg",
     label: "Figma",
     desc: "Design tool",
@@ -33,6 +28,11 @@ const skillItem = [
     label: "NodeJS",
     desc: "Web Server",
   },
+  {
+    imgSrc: "/images/react.svg",
+    label: "React",
+    desc: "Framework",
+  },
 ];
 
 const Skill = () => {
@@ -51,7 +51,7 @@ const Skill = () => {
       duration: 1500,
       delay: 200,
       reset: true,
-      interval: 150, // Kartlar arasında gecikme
+      interval: 150,
     });
   }, []);
 
